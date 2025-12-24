@@ -358,6 +358,7 @@ private struct PersistedSettings: Codable {
     var selectorDisplayMode: SelectorDisplayMode?
     var windowAppearance: WindowAppearanceSettings?
     var colorScheme: AppColorScheme?
+    var keepOverlayOnTop: Bool?
 }
 
 class SettingsWindow: NSWindow {
@@ -450,6 +451,11 @@ class Settings: ObservableObject {
             NotificationCenter.default.post(name: .colorSchemeChanged, object: nil)
         }
     }
+    @Published var keepOverlayOnTop: Bool = true {
+        didSet {
+            NotificationCenter.default.post(name: .overlayOnTopSettingChanged, object: nil)
+        }
+    }
     
     func reset() {
         services = []
@@ -461,6 +467,7 @@ class Settings: ObservableObject {
         selectorDisplayMode = .auto
         windowAppearance = .default
         colorScheme = .system
+        keepOverlayOnTop = true
     }
 
     private let settingsFile: URL = {
@@ -1030,6 +1037,9 @@ class Settings: ObservableObject {
         if colorScheme != (persisted.colorScheme ?? .system) {
             colorScheme = persisted.colorScheme ?? .system
         }
+        if keepOverlayOnTop != (persisted.keepOverlayOnTop ?? true) {
+            keepOverlayOnTop = persisted.keepOverlayOnTop ?? true
+        }
         if loadedFromDisk, let storedHotkey = persisted.hotkey {
             hotkeyConfiguration = storedHotkey
         } else if loadedFromDisk, let legacy = loadLegacyHotkeyConfiguration() {
@@ -1063,7 +1073,8 @@ class Settings: ObservableObject {
                                             dockVisibility: dockVisibility,
                                             selectorDisplayMode: selectorDisplayMode,
                                             windowAppearance: windowAppearance,
-                                            colorScheme: colorScheme)
+                                            colorScheme: colorScheme,
+                                            keepOverlayOnTop: keepOverlayOnTop)
             let data = try JSONEncoder().encode(payload)
             try data.write(to: settingsFile)
         } catch {

@@ -108,6 +108,15 @@ final class MainWindowController: NSWindowController, NSWindowDelegate {
         setupUI()
         self.window?.delegate = self
         addObserver(self, forKeyPath: "window", options: [.new], context: nil)
+        
+        // Listen for overlay on top setting changes
+        NotificationCenter.default.publisher(for: .overlayOnTopSettingChanged)
+            .sink { [weak self] _ in
+                if let window = self?.window {
+                    self?.updateWindowLevel(for: window)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     required init?(coder: NSCoder) {
@@ -581,7 +590,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate {
     }
 
     private func configureWindow(for window: NSWindow) {
-        window.level = .floating
+        updateWindowLevel(for: window)
         window.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary, .stationary]
         
         let isUITesting = ProcessInfo.processInfo.arguments.contains("--uitesting")
@@ -619,6 +628,14 @@ final class MainWindowController: NSWindowController, NSWindowDelegate {
         backgroundEffectView = effect
         
         applyWindowAppearance()
+    }
+    
+    private func updateWindowLevel(for window: NSWindow) {
+        if Settings.shared.keepOverlayOnTop {
+            window.level = .floating
+        } else {
+            window.level = .normal
+        }
     }
 
     private func setupUI() {

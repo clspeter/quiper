@@ -322,10 +322,31 @@ final class AppController: NSObject, NSWindowDelegate {
             if AppDelegate.sharedSettingsWindow.isVisible && AppDelegate.sharedSettingsWindow.isKeyWindow {
                 return
             }
-            if self.windowController.window?.isVisible == true {
-                self.hideWindow(nil)
+            
+            let keepOnTop = Settings.shared.keepOverlayOnTop
+            let window = self.windowController.window
+            let isVisible = window?.isVisible == true
+            let isKeyWindow = window?.isKeyWindow == true
+            
+            if keepOnTop {
+                // Original behavior: toggle show/hide
+                if isVisible {
+                    self.hideWindow(nil)
+                } else {
+                    self.showWindow(nil)
+                }
             } else {
-                self.showWindow(nil)
+                // New behavior: if not in foreground, bring to foreground; if in foreground, hide
+                if isVisible && isKeyWindow {
+                    // Window is visible and in foreground, hide it
+                    self.hideWindow(nil)
+                } else if isVisible {
+                    // Window is visible but not in foreground, bring it to foreground
+                    self.showWindow(nil)
+                } else {
+                    // Window is not visible, show it
+                    self.showWindow(nil)
+                }
             }
         }
     }

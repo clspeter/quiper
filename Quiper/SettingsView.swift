@@ -69,7 +69,7 @@ struct GeneralSettingsView: View {
                 SettingsSection(title: "Startup") {
                     SettingsToggleRow(
                         title: "Launch at login",
-                        message: "Install Quiper as a login item so it’s ready immediately after you sign in.",
+                        message: "Install Quiper as a login item so it's ready immediately after you sign in.",
                         isOn: $launchAtLogin
                     )
                     .onChange(of: launchAtLogin) { _, isEnabled in
@@ -78,6 +78,17 @@ struct GeneralSettingsView: View {
                         } else {
                             appController?.uninstallFromLogin(nil)
                         }
+                    }
+                }
+                
+                SettingsSection(title: "Window Behavior") {
+                    SettingsToggleRow(
+                        title: "Keep overlay on top",
+                        message: "When enabled, the overlay stays in the foreground. When disabled, pressing the hotkey brings it to the foreground if it's not already there, or hides it if it is.",
+                        isOn: $settings.keepOverlayOnTop
+                    )
+                    .onChange(of: settings.keepOverlayOnTop) { _, _ in
+                        settings.saveSettings()
                     }
                 }
                 
