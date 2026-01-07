@@ -1,6 +1,21 @@
 # Changelog
 
-## Unreleased
+## [2.6.0] - 2025-12-27
+
+### Added
+
+- **Custom Blur Radius**: Implemented precise variable blur control for window background.
+
+### Changed
+
+- **Window Hierarchy**: Updated window hierarchy handling to support dynamic removal of effect views, improving performance and test reliability.
+
+## [2.5.1] - 2025-12-24
+
+### Fixed
+
+- **Color Settings Saving**: Fixed potential color data corruption when saving custom colors by ensuring safe sRGB conversion (`CodableColor`).
+- **Focus Restoration**: Fixed an issue where the main window would not regain focus after closing the Settings window via the close button. Implemented robust async focus restoration and updated UI tests to verify strict focus state.
 
 ## [2.5.0] - 2025-12-24
 
@@ -19,7 +34,7 @@
 ### Fixed
 
 - **Blur Material Updates**: Fixed blur material style changes not applying on macOS 26 (Tahoe) by using `NSVisualEffectView` consistently across all macOS versions.
-- **Solid Color Background**: Fixed solid color mode rendering incorrectly (either covering all content or showing nothing). Now uses layer-based background coloring while keeping content visible.
+- **Solid Color Background**: Fixed solid color mode rendering incorrectly (either covering all content or showing nothing). Now uses a refactored view hierarchy with a dedicated container view to robustly handle both solid and blurred backgrounds.
 
 ## [2.4.0] - 2025-12-22
 
